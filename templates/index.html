@@ -97,13 +97,14 @@
 
     const evt = new EventSource('/api/simulate?' + params.toString());
     const out = document.getElementById('progress');
-    out.textContent = 'Starting simulation...\n';
+    out.textContent = 'Running simulation...\n';
 
     evt.onmessage = e => {
       const data = JSON.parse(e.data);
 
       if (data.counter) {
         // out.textContent += `[Draw ${data.counter}]\n`;
+		console.log($data.counter);
       }
 
       if (data.drawPreview) {
