@@ -1,20 +1,112 @@
+/* Dynamic background */
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(45deg, #ff00cc, #333399, #00ffe4, #fffc00, #ff00cc);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Main container */
+.container {
+  text-align: center;
+  background: rgba(0, 0, 0, 0.7); /* Darker contrasting window */
+  padding: 2rem;
+  border-radius: 2rem;
+  box-shadow: 0 0 2rem rgba(0, 0, 0, 0.8);
+  border: 2px solid #fff;
+}
+
+/* Title */
+h1 {
+  color: #fffc00;
+  text-shadow: 0 0 0.5rem #000;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: titlePulse 2s infinite alternate;
+}
+
+@keyframes titlePulse {
+  from { text-shadow: 0 0 0.5rem #000; transform: scale(1); }
+  to   { text-shadow: 0 0 2rem #fffc00; transform: scale(1.05); }
+}
+
+/* Balls container */
+.balls-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+/* Ball style */
 .ball {
-  width: 3rem;
-  height: 3rem;
+  width: 4rem;
+  height: 4rem;
   border-radius: 50%;
-  background: #333;
-  color: white;
+  background: radial-gradient(circle at 30% 30%, #fff, #ccc);
+  margin: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  margin: 0.5rem;
-  opacity: 0;
-  animation: drop 0.5s forwards;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  box-shadow: 0 0 1rem #fff, inset 0 0 0.5rem rgba(0, 0, 0, 0.2);
+  animation: drop 0.6s forwards, float 3s ease-in-out infinite, spin 4s linear infinite;
 }
 
+/* Drop animation */
 @keyframes drop {
-  from { transform: translateY(-2rem); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+  from { transform: translateY(-5rem) scale(0.5); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1rem); }
+}
+
+/* Spin animation */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Button */
+#draw-btn {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  border: none;
+  cursor: pointer;
+  border-radius: 1rem;
+  background: #ff0080;
+  color: #fff;
+  box-shadow: 0 0 1rem #ff0080;
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: btnGlow 2s infinite alternate;
+}
+
+#draw-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 2rem #ff0080;
+}
+
+@keyframes btnGlow {
+  from { box-shadow: 0 0 1rem #ff0080; }
+  to   { box-shadow: 0 0 2rem #ff00ff; }
 }
 
