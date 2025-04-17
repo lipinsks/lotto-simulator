@@ -2,17 +2,121 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lotto Draw Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lotto Simulator</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    html, body {
+      height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .balls-container button.ball {
+      width: 2.5rem;
+      height: 2.5rem;
+      font-size: 1rem;
+      margin: 0.25rem;
+    }
+    .container {
+      width: 95%;
+      max-width: 500px;
+      margin: auto;
+    }
+    pre#progress {
+      max-height: 150px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>Lotto Draw Simulator</h1>
-    <div id="balls" class="balls-container"></div>
-    <button id="draw-btn">Draw Balls</button>
+    <h1>Lotto Simulator</h1>
+
+    <!-- Lotto card grid -->
+    <div id="grid" class="balls-container"></div>
+
+    <!-- Controls -->
+    <button id="start-btn">Start Simulation</button>
+
+    <!-- Display last draw every 100,000 -->
+    <h2 style="color: white; margin-top: 2rem;">Last Draw</h2>
+    <div id="last-draw" class="balls-container"></div>
+
+    <!-- Progress output -->
+    <pre id="progress" style="margin-top:1rem; color:#fff; text-align:left;"></pre>
   </div>
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+  <script>
+  // generate grid of 1–49
+  const grid = document.getElementById('grid');
+  const selected = new Set();
+
+  for (let i = 1; i <= 49; i++) {
+    const btn = document.createElement('button');
+    btn.textContent = i;
+    btn.className = 'ball';
+    btn.addEventListener('click', () => {
+      if (selected.has(i)) {
+        selected.delete(i);
+        btn.style.background = '';
+      } else if (selected.size < 6) {
+        selected.add(i);
+        btn.style.background = '#ff0080';
+      }
+    });
+    grid.appendChild(btn);
+  }
+
+  function renderDraw(draw, highlight = false) {
+    const container = document.getElementById('last-draw');
+    container.innerHTML = '';
+    const selectedArray = Array.from(selected);
+    draw.forEach(n => {
+      const b = document.createElement('div');
+      b.className = 'ball';
+      b.textContent = n;
+      if (highlight && selectedArray.includes(n)) {
+        b.style.background = 'limegreen';
+        b.style.color = 'white';
+      }
+      container.appendChild(b);
+    });
+  }
+
+  document.getElementById('start-btn').addEventListener('click', () => {
+    if (selected.size !== 6) {
+      alert('Please pick exactly 6 numbers.');
+      return;
+    }
+    const picks = Array.from(selected);
+    const params = new URLSearchParams();
+    picks.forEach(n => params.append('picks', n));
+
+    const evt = new EventSource('/api/simulate?' + params.toString());
+    const out = document.getElementById('progress');
+    out.textContent = 'Starting simulation...\n';
+
+    evt.onmessage = e => {
+      const data = JSON.parse(e.data);
+      if (!data.draw) {
+        // out.textContent += `[Draw ${data.counter}]\n`;
+      } else {
+        renderDraw(data.draw, true);
+        out.textContent += `\nMATCH! Found after ${data.counter} draws. Cost: ${data.cost} PLN.\nNumbers: ${data.draw.join(', ')}\n`;
+        evt.close();
+      }
+
+      if (data.drawPreview) {
+        renderDraw(data.drawPreview);
+      }
+
+      out.scrollTop = out.scrollHeight;
+    };
+  });
+  </script>
 </body>
 </html>
 
