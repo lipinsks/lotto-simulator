@@ -101,16 +101,27 @@
 
     evt.onmessage = e => {
       const data = JSON.parse(e.data);
-      if (!data.draw) {
+
+      if (data.counter) {
         // out.textContent += `[Draw ${data.counter}]\n`;
-      } else {
-        renderDraw(data.draw, true);
-        out.textContent += `\nMATCH! Found after ${data.counter} draws. Cost: ${data.cost} PLN.\nNumbers: ${data.draw.join(', ')}\n`;
-        evt.close();
       }
 
       if (data.drawPreview) {
         renderDraw(data.drawPreview);
+
+        const matched = data.drawPreview.filter(n => picks.includes(n)).length;
+      //if (matched === 3 || matched === 4 || matched === 5) {
+	//  const msg = document.createElement('div');
+	  //msg.textContent = `🎉 You matched ${matched} numbers! After ${data.counter} draws. Cost: ${data.cost} PLN\n`;
+	  //msg.style.color = matched === 3 ? 'yellow' : matched === 4 ? 'orange' : 'lime';
+	  //out.appendChild(msg);
+	//	}
+	}
+
+      if (data.draw) {
+        renderDraw(data.draw, true);
+        out.textContent += `\n✅ MATCH! Found after ${data.counter} draws. You would have paid: ${data.cost} PLN.\nNumbers: ${data.draw.join(', ')}\n`;
+        evt.close();
       }
 
       out.scrollTop = out.scrollHeight;
